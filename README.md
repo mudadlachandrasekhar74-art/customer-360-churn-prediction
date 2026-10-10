@@ -3,8 +3,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Database](https://img.shields.io/badge/Warehouse-SQLite%20%2F%20PostgreSQL-green.svg)](https://www.sqlite.org/)
 [![ML Framework](https://img.shields.io/badge/ML-Scikit--Learn%20%7C%20XGBoost-orange.svg)](https://xgboost.readthedocs.io/)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Flask%20%7C%20Chart.js-purple.svg)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](#)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Flask%20%7C%20Chart.js-purple.svg)](https://flask.palletsprojects.com/)(#)
 
 An end-to-end, enterprise-grade Data Engineering and Predictive Machine Learning platform built on Brazilian E-Commerce transaction data (Olist). The system extracts, validates, models, and transforms 100K+ raw multi-table records into a Kimball Star Schema warehouse, engineers a 41-feature **Customer 360** profile, segments customers using RFM & K-Means clustering, predicts customer churn probability using an optimized **XGBoost** model, and operationalizes actionable retention strategies via an interactive **Executive Dashboard**.
 
@@ -185,7 +184,7 @@ Start the local analytics dashboard server:
 python dashboard/app.py
 ```
 
-Open your browser at **[http://127.0.0.1:5000](http://127.0.0.1:5000)**.
+
 
 ---
 
@@ -214,5 +213,4 @@ The single-page web dashboard provides 5 interactive views:
 
 ---
 
-## 📄 License
-This project is licensed under the MIT License — see the LICENSE file for details.
+
