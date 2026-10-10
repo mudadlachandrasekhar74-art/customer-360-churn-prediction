@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Large SQLite databases (>100MB limit on GitHub)
+*.db
+*.sqlite
+*.sqlite3
+data/processed/olist_warehouse.db
+
+# Large raw datasets (optional, keep samples or document download link)
+# data/raw/*.csv
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Task logs & temporary files
+.system_generated/
+*.log

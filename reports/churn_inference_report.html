@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Churn Inference Report — Deloitte Olist Platform</title>
+<style>
+  :root {
+    --bg: #0f1117; --panel: #1a1d27; --border: #30363d;
+    --text: #c9d1d9; --heading: #e6edf3; --accent: #58a6ff;
+    --danger: #e74c3c; --warning: #f39c12; --success: #27ae60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif;
+          font-size: 14px; line-height: 1.6; padding: 32px; }
+  h1 { color: var(--heading); font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  h2 { color: var(--heading); font-size: 18px; font-weight: 600; margin: 36px 0 12px;
+        border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .meta { color: #8b949e; font-size: 12px; margin-bottom: 28px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+               gap: 16px; margin: 20px 0 36px; }
+  .kpi-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+               padding: 20px 22px; }
+  .kpi-danger  { border-top: 3px solid var(--danger);  }
+  .kpi-warning { border-top: 3px solid var(--warning); }
+  .kpi-success { border-top: 3px solid var(--success); }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
+                color: #8b949e; margin-bottom: 6px; }
+  .kpi-value { font-size: 28px; font-weight: 700; color: var(--heading); }
+  .kpi-sub   { font-size: 11px; color: #8b949e; margin-top: 4px; }
+  .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                  gap: 14px; margin: 16px 0 28px; }
+  .action-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+                  padding: 16px 18px; }
+  .action-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .action-card.danger  h3 { color: var(--danger);  }
+  .action-card.warning h3 { color: var(--warning); }
+  .action-card.success h3 { color: var(--success); }
+  .action-card p { font-size: 12px; color: var(--text); line-height: 1.5; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data-table th { background: #21262d; color: var(--heading); font-weight: 600;
+                         padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.data-table td { padding: 7px 12px; border-bottom: 1px solid #21262d; color: var(--text); }
+  table.data-table tr:hover td { background: #21262d; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px;
+                 background: var(--panel); margin-bottom: 8px; }
+  .note { font-size: 11px; color: #8b949e; margin-top: 6px; font-style: italic; }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border);
+            color: #8b949e; font-size: 11px; text-align: center; }
+</style>
+</head>
+<body>
+<h1>Churn Prediction Inference Report</h1>
+<p class="meta">Deloitte Olist Customer 360 Platform &nbsp;|&nbsp; Generated: 2026-10-10T05:44:03Z &nbsp;|&nbsp; Champion Model: XGBoost</p>
+
+<h2>Executive KPIs</h2>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Customers Scored</div>
+                <div class="kpi-value">96,096</div>
+            </div>
+            <div class="kpi-card kpi-danger">
+                <div class="kpi-label">Predicted Churners</div>
+                <div class="kpi-value">61,605</div>
+                <div class="kpi-sub">64.1% of customer base</div>
+            </div>
+            <div class="kpi-card kpi-danger">
+                <div class="kpi-label">High Risk</div>
+                <div class="kpi-value">5,658</div>
+                <div class="kpi-sub">5.9% — Immediate Action</div>
+            </div>
+            <div class="kpi-card kpi-warning">
+                <div class="kpi-label">Medium Risk</div>
+                <div class="kpi-value">74,540</div>
+                <div class="kpi-sub">77.6% — Proactive Engagement</div>
+            </div>
+            <div class="kpi-card kpi-success">
+                <div class="kpi-label">Low Risk</div>
+                <div class="kpi-value">15,898</div>
+                <div class="kpi-sub">16.5% — Sustain Loyalty</div>
+            </div>
+        </div>
+
+<h2>Recommended Business Actions</h2>
+<div class="action-grid">
+  <div class="action-card danger">
+    <h3>🔴 High Risk Customers (5,658)</h3>
+    <p>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</p>
+  </div>
+  <div class="action-card warning">
+    <h3>🟡 Medium Risk Customers (74,540)</h3>
+    <p>Proactive engagement — targeted email/push with loyalty reward or bundle discount</p>
+  </div>
+  <div class="action-card success">
+    <h3>🟢 Low Risk Customers (15,898)</h3>
+    <p>Sustain loyalty — routine newsletter, birthday reward, new-arrival highlights</p>
+  </div>
+</div>
+
+<h2>Decile Analysis — Lift &amp; Capture</h2>
+<div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Decile</th>
+      <th>Customers</th>
+      <th>Avg Churn Probability</th>
+      <th>Predicted Churners</th>
+      <th>Cumulative Churners</th>
+      <th>Churn Captured %</th>
+      <th>Cumulative Capture %</th>
+      <th>Lift vs Baseline</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10</td>
+      <td>9602</td>
+      <td>0.7381</td>
+      <td>9602</td>
+      <td>9602</td>
+      <td>15.6</td>
+      <td>15.6</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>9614</td>
+      <td>0.6346</td>
+      <td>9614</td>
+      <td>19216</td>
+      <td>15.6</td>
+      <td>31.2</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>9594</td>
+      <td>0.5986</td>
+      <td>9594</td>
+      <td>28810</td>
+      <td>15.6</td>
+      <td>46.8</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>9626</td>
+      <td>0.5709</td>
+      <td>9626</td>
+      <td>38436</td>
+      <td>15.6</td>
+      <td>62.4</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>9602</td>
+      <td>0.5474</td>
+      <td>9602</td>
+      <td>48038</td>
+      <td>15.6</td>
+      <td>78.0</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>9602</td>
+      <td>0.5246</td>
+      <td>9602</td>
+      <td>57640</td>
+      <td>15.6</td>
+      <td>93.6</td>
+      <td>1.56</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>9625</td>
+      <td>0.4963</td>
+      <td>3965</td>
+      <td>61605</td>
+      <td>6.4</td>
+      <td>100.0</td>
+      <td>0.64</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>9607</td>
+      <td>0.4542</td>
+      <td>0</td>
+      <td>61605</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>9612</td>
+      <td>0.3853</td>
+      <td>0</td>
+      <td>61605</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>9612</td>
+      <td>0.2623</td>
+      <td>0</td>
+      <td>61605</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>0.00</td>
+    </tr>
+  </tbody>
+</table></div>
+<p class="note">Decile 10 = highest churn risk. Lift vs Baseline = tier churn rate ÷ overall predicted churn rate.</p>
+
+<h2>Churn Risk by Brazilian State</h2>
+<div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>State</th>
+      <th>Total Customers</th>
+      <th>Predicted Churners</th>
+      <th>Avg Churn Probability</th>
+      <th>High Risk Count</th>
+      <th>Avg Monetary Value (R$)</th>
+      <th>Churn Rate %</th>
+      <th>High Risk %</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RJ</td>
+      <td>12381</td>
+      <td>9449</td>
+      <td>0.5666</td>
+      <td>2030</td>
+      <td>147.32</td>
+      <td>76.32</td>
+      <td>16.40</td>
+    </tr>
+    <tr>
+      <td>PA</td>
+      <td>949</td>
+      <td>704</td>
+      <td>0.5835</td>
+      <td>158</td>
+      <td>188.56</td>
+      <td>74.18</td>
+      <td>16.65</td>
+    </tr>
+    <tr>
+      <td>SC</td>
+      <td>3531</td>
+      <td>2594</td>
+      <td>0.5581</td>
+      <td>379</td>
+      <td>147.29</td>
+      <td>73.46</td>
+      <td>10.73</td>
+    </tr>
+    <tr>
+      <td>MG</td>
+      <td>11252</td>
+      <td>8098</td>
+      <td>0.5448</td>
+      <td>557</td>
+      <td>140.87</td>
+      <td>71.97</td>
+      <td>4.95</td>
+    </tr>
+    <tr>
+      <td>GO</td>
+      <td>1950</td>
+      <td>1380</td>
+      <td>0.5477</td>
+      <td>133</td>
+      <td>151.22</td>
+      <td>70.77</td>
+      <td>6.82</td>
+    </tr>
+    <tr>
+      <td>ES</td>
+      <td>1964</td>
+      <td>1386</td>
+      <td>0.5441</td>
+      <td>115</td>
+      <td>140.09</td>
+      <td>70.57</td>
+      <td>5.86</td>
+    </tr>
+    <tr>
+      <td>CE</td>
+      <td>1313</td>
+      <td>925</td>
+      <td>0.5660</td>
+      <td>207</td>
+      <td>173.26</td>
+      <td>70.45</td>
+      <td>15.77</td>
+    </tr>
+    <tr>
+      <td>RS</td>
+      <td>5276</td>
+      <td>3698</td>
+      <td>0.5485</td>
+      <td>435</td>
+      <td>142.23</td>
+      <td>70.09</td>
+      <td>8.24</td>
+    </tr>
+    <tr>
+      <td>MS</td>
+      <td>693</td>
+      <td>483</td>
+      <td>0.5434</td>
+      <td>41</td>
+      <td>168.32</td>
+      <td>69.70</td>
+      <td>5.92</td>
+    </tr>
+    <tr>
+      <td>AL</td>
+      <td>400</td>
+      <td>276</td>
+      <td>0.5675</td>
+      <td>76</td>
+      <td>200.79</td>
+      <td>69.00</td>
+      <td>19.00</td>
+    </tr>
+    <tr>
+      <td>AC</td>
+      <td>77</td>
+      <td>53</td>
+      <td>0.6449</td>
+      <td>43</td>
+      <td>207.57</td>
+      <td>68.83</td>
+      <td>55.84</td>
+    </tr>
+    <tr>
+      <td>PR</td>
+      <td>4879</td>
+      <td>3327</td>
+      <td>0.5339</td>
+      <td>219</td>
+      <td>139.81</td>
+      <td>68.19</td>
+      <td>4.49</td>
+    </tr>
+    <tr>
+      <td>MA</td>
+      <td>726</td>
+      <td>487</td>
+      <td>0.5548</td>
+      <td>80</td>
+      <td>165.24</td>
+      <td>67.08</td>
+      <td>11.02</td>
+    </tr>
+    <tr>
+      <td>BA</td>
+      <td>3275</td>
+      <td>2146</td>
+      <td>0.5259</td>
+      <td>127</td>
+      <td>156.07</td>
+      <td>65.53</td>
+      <td>3.88</td>
+    </tr>
+    <tr>
+      <td>PB</td>
+      <td>517</td>
+      <td>335</td>
+      <td>0.5325</td>
+      <td>44</td>
+      <td>222.47</td>
+      <td>64.80</td>
+      <td>8.51</td>
+    </tr>
+    <tr>
+      <td>MT</td>
+      <td>875</td>
+      <td>547</td>
+      <td>0.5193</td>
+      <td>40</td>
+      <td>178.90</td>
+      <td>62.51</td>
+      <td>4.57</td>
+    </tr>
+    <tr>
+      <td>RR</td>
+      <td>45</td>
+      <td>28</td>
+      <td>0.5241</td>
+      <td>5</td>
+      <td>173.99</td>
+      <td>62.22</td>
+      <td>11.11</td>
+    </tr>
+    <tr>
+      <td>TO</td>
+      <td>273</td>
+      <td>168</td>
+      <td>0.5150</td>
+      <td>9</td>
+      <td>181.76</td>
+      <td>61.54</td>
+      <td>3.30</td>
+    </tr>
+    <tr>
+      <td>PI</td>
+      <td>482</td>
+      <td>296</td>
+      <td>0.5222</td>
+      <td>28</td>
+      <td>180.32</td>
+      <td>61.41</td>
+      <td>5.81</td>
+    </tr>
+    <tr>
+      <td>RN</td>
+      <td>474</td>
+      <td>280</td>
+      <td>0.5269</td>
+      <td>38</td>
+      <td>175.18</td>
+      <td>59.07</td>
+      <td>8.02</td>
+    </tr>
+    <tr>
+      <td>RO</td>
+      <td>240</td>
+      <td>138</td>
+      <td>0.5193</td>
+      <td>11</td>
+      <td>192.75</td>
+      <td>57.50</td>
+      <td>4.58</td>
+    </tr>
+    <tr>
+      <td>SP</td>
+      <td>40296</td>
+      <td>22556</td>
+      <td>0.4861</td>
+      <td>707</td>
+      <td>129.17</td>
+      <td>55.98</td>
+      <td>1.75</td>
+    </tr>
+    <tr>
+      <td>SE</td>
+      <td>341</td>
+      <td>188</td>
+      <td>0.5181</td>
+      <td>29</td>
+      <td>173.30</td>
+      <td>55.13</td>
+      <td>8.50</td>
+    </tr>
+    <tr>
+      <td>DF</td>
+      <td>2072</td>
+      <td>1117</td>
+      <td>0.5141</td>
+      <td>77</td>
+      <td>145.66</td>
+      <td>53.91</td>
+      <td>3.72</td>
+    </tr>
+    <tr>
+      <td>PE</td>
+      <td>1605</td>
+      <td>865</td>
+      <td>0.5046</td>
+      <td>59</td>
+      <td>163.60</td>
+      <td>53.89</td>
+      <td>3.68</td>
+    </tr>
+    <tr>
+      <td>AM</td>
+      <td>143</td>
+      <td>59</td>
+      <td>0.4678</td>
+      <td>8</td>
+      <td>156.34</td>
+      <td>41.26</td>
+      <td>5.59</td>
+    </tr>
+    <tr>
+      <td>AP</td>
+      <td>67</td>
+      <td>22</td>
+      <td>0.4497</td>
+      <td>3</td>
+      <td>201.11</td>
+      <td>32.84</td>
+      <td>4.48</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h2>Top High-Risk Customers (Actionable CRM List — Top 50 shown)</h2>
+<div class="table-wrap"><table class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Rank</th>
+      <th>customer_unique_id</th>
+      <th>customer_state</th>
+      <th>churn_probability</th>
+      <th>risk_level</th>
+      <th>risk_decile</th>
+      <th>monetary_value</th>
+      <th>total_orders</th>
+      <th>average_review_score</th>
+      <th>last_order_date</th>
+      <th>days_since_last_order</th>
+      <th>preferred_payment_method</th>
+      <th>recommended_action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>5aad27a7b4f74b1c3389d56c74db1057</td>
+      <td>SC</td>
+      <td>0.9829</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-03-01 10:02:02</td>
+      <td>596</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>48a5a17d697d2da4735f51e37dfbdc50</td>
+      <td>RS</td>
+      <td>0.9814</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-06 13:04:40</td>
+      <td>346</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>23b8272c10c49458eac0b8626f0666ca</td>
+      <td>CE</td>
+      <td>0.9811</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-10-06 19:37:46</td>
+      <td>376</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>b090fd67efe21ab297f5c0c6cb040e31</td>
+      <td>MA</td>
+      <td>0.9800</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-01 18:16:28</td>
+      <td>350</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>763cd1cf30c543008f5ea9b4418f7157</td>
+      <td>PB</td>
+      <td>0.9794</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-24 12:56:49</td>
+      <td>328</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>2b5d4d8209646f5801fc85e3e7a83ae1</td>
+      <td>PR</td>
+      <td>0.9787</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-02-18 23:41:47</td>
+      <td>606</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>84b19ed453ffee6b3a13dae20065543a</td>
+      <td>PR</td>
+      <td>0.9787</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-08-13 17:33:09</td>
+      <td>430</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>b339a1ec295defef7cd27439c8718066</td>
+      <td>PR</td>
+      <td>0.9787</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-12-29 00:18:54</td>
+      <td>293</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>02ed27f9cd8f0a7ffc59c7e10b46b9c0</td>
+      <td>RJ</td>
+      <td>0.9776</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-12-07 20:38:53</td>
+      <td>314</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>98e8535b4cfc39e898513803807da125</td>
+      <td>RJ</td>
+      <td>0.9776</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-06-13 21:11:58</td>
+      <td>491</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>9ea675ae7d2fc65e2c62316827118da0</td>
+      <td>RJ</td>
+      <td>0.9776</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-06-20 17:53:16</td>
+      <td>484</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>a2c18eec54a2fa6cfa424bd3266d584f</td>
+      <td>RJ</td>
+      <td>0.9776</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-10-07 14:01:14</td>
+      <td>376</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>d753489f200ed3b03e0466fbb4192bbe</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-09-12 00:08:18</td>
+      <td>401</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>ec31ab57bc5e2588a118777ce93ebaf0</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-07-11 04:47:35</td>
+      <td>464</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>cfc8d9c0287ded52a81b90c102827129</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-12-22 12:41:34</td>
+      <td>300</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>866d6f4be080dca2563139c043804db9</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-01-18 17:41:34</td>
+      <td>272</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>d0449005d6f06d09b2d12cdada834a85</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-05-09 09:37:25</td>
+      <td>527</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>b9efc86b7c6269eaeba5bdbdd5127e1b</td>
+      <td>MG</td>
+      <td>0.9767</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-01-30 10:29:25</td>
+      <td>626</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>c46e73e2dcd78c07869a4772469e9d3e</td>
+      <td>BA</td>
+      <td>0.9758</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-01-04 11:33:15</td>
+      <td>287</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>c8d832b1e6f4aa662d0fefabfca04265</td>
+      <td>PE</td>
+      <td>0.9755</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-06-30 13:26:22</td>
+      <td>475</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>61657cd378eabeaa8ec89a448432357d</td>
+      <td>RJ</td>
+      <td>0.9751</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-02-09 19:51:24</td>
+      <td>250</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>70b1b3192204865d74286c5c85196102</td>
+      <td>RJ</td>
+      <td>0.9751</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-02-11 19:26:28</td>
+      <td>613</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>6ef157b9dbeb8f79b07a06de1cfeae4e</td>
+      <td>MG</td>
+      <td>0.9748</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>2.0</td>
+      <td>2017-12-14 10:33:27</td>
+      <td>308</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>73dfdbee68e446152015276af9215a3a</td>
+      <td>MG</td>
+      <td>0.9740</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-21 11:34:01</td>
+      <td>331</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>d4b2193f58a874bcfb2352407869ddf9</td>
+      <td>MG</td>
+      <td>0.9740</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-09-22 15:42:18</td>
+      <td>391</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>0f4b07a8468f03fbbe917a11f5e5ad86</td>
+      <td>MA</td>
+      <td>0.9729</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-04-08 00:08:18</td>
+      <td>558</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>f37b8b16ee7c2e67c6f91105d6bdde0f</td>
+      <td>PA</td>
+      <td>0.9719</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>49.99</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-03-13 15:44:44</td>
+      <td>219</td>
+      <td>boleto</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>b2d2a58afa879edda95e349f7390903d</td>
+      <td>AL</td>
+      <td>0.9701</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>2.0</td>
+      <td>2017-12-10 10:27:39</td>
+      <td>312</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>123ecbb4fb560cff85dd1072dd0a613d</td>
+      <td>RJ</td>
+      <td>0.9690</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2016-10-08 12:44:32</td>
+      <td>740</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>cef82db324c0cd93edb2c23aae1a69ac</td>
+      <td>PA</td>
+      <td>0.9680</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>47.65</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-03-11 14:41:55</td>
+      <td>221</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>ca759b8e1385038c002c281e4c4cc6a1</td>
+      <td>RJ</td>
+      <td>0.9678</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>99.90</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-26 22:34:08</td>
+      <td>325</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>89ff26f9d000b4a6d0f6e8c513f1cf08</td>
+      <td>MT</td>
+      <td>0.9656</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2016-10-04 11:44:01</td>
+      <td>744</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>14843983d4a159080f6afe4b7f346e7c</td>
+      <td>RJ</td>
+      <td>0.9648</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>47.60</td>
+      <td>2</td>
+      <td>1.0</td>
+      <td>2018-03-02 17:47:40</td>
+      <td>229</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>689c86311ffef9f2c5c525cad2717e53</td>
+      <td>RJ</td>
+      <td>0.9631</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>89.90</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-02-26 09:47:27</td>
+      <td>234</td>
+      <td>boleto</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>ab14aff32b9c7c55378170003a076665</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-03-21 23:15:29</td>
+      <td>575</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>55fbb57fd54c35a38c80c2a032a6ca6e</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-12-05 01:07:52</td>
+      <td>317</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>72994e988788873a1df6dad43d38a2bd</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-03-23 23:41:40</td>
+      <td>573</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>b781537412012c84c120b0eec609a9df</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-03-28 10:43:54</td>
+      <td>204</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>81acf66173bb80d6988f3aa37d56176b</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-27 16:03:51</td>
+      <td>325</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>e9bd60258117342273c84198e732b955</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-02-02 10:43:43</td>
+      <td>623</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>1350e2fa0415f0c50796bde8c33325a2</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-29 08:39:03</td>
+      <td>323</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>2615f18f801b0156237b068570d64217</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-12-04 13:14:31</td>
+      <td>318</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>ba0fed3e80432a2a1679d58a24732c93</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-06-11 23:20:34</td>
+      <td>493</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>5ef3d73ff5f2017d60ad9e87633f7143</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-09 22:40:17</td>
+      <td>342</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>f4514fb16ee31d8873c1d97c91cb8653</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-02-13 21:40:28</td>
+      <td>246</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>6b19a736d2caf6c16c7355879c33cff4</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-01-25 14:52:00</td>
+      <td>266</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>8141dd1e051afe7d72079570fe72d5f1</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-26 02:13:57</td>
+      <td>326</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>2da54b98229287d62e9416b22c7c701d</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-23 10:53:08</td>
+      <td>329</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>3da26ad0ffe9feea8ce65b20cedc17bf</td>
+      <td>SP</td>
+      <td>0.9599</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2017-11-17 10:23:15</td>
+      <td>335</td>
+      <td>credit_card</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+    <tr>
+      <td>50</td>
+      <td>c62c2750a01ad7d2ebacdfcc17717a1c</td>
+      <td>RJ</td>
+      <td>0.9597</td>
+      <td>High Risk</td>
+      <td>10</td>
+      <td>89.90</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2018-02-25 11:24:39</td>
+      <td>235</td>
+      <td>boleto</td>
+      <td>Immediate win-back campaign — personalised offer + CSR outreach within 48 h</td>
+    </tr>
+  </tbody>
+</table></div>
+<p class="note">Full list (top 500) available in the Excel report: churn_inference_report.xlsx → Sheet: Top_High_Risk</p>
+
+<footer>Deloitte Analytics Practice &nbsp;|&nbsp; Olist Churn Prediction Platform &nbsp;|&nbsp; Phase 9 Batch Inference Report</footer>
+</body>
+</html>

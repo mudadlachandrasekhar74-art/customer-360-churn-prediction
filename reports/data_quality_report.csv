@@ -1,0 +1,23 @@
+rule_name,category,dataset,criticality,records_checked,failed_records,failure_percentage,status
+Missing Customer IDs,Completeness,customers,HIGH,99441,0,0.0,PASSED
+Missing Order Purchase Dates,Completeness,orders,HIGH,99441,0,0.0,PASSED
+Missing Product Categories,Completeness,products,MEDIUM,32951,610,1.8512,WARNING
+Missing Product Physical Dimensions,Completeness,products,LOW,32951,2,0.0061,WARNING
+Missing Review Scores,Completeness,reviews,HIGH,99224,0,0.0,PASSED
+Negative or Zero Item Prices,Accuracy,order_items,HIGH,112650,0,0.0,PASSED
+Negative Freight Values,Accuracy,order_items,HIGH,112650,0,0.0,PASSED
+Zero or Negative Payment Values,Accuracy,payments,HIGH,103886,9,0.0087,WARNING
+Delivery Date Prior to Purchase Date,Accuracy,orders,HIGH,96476,0,0.0,PASSED
+Out-of-Range Review Scores,Accuracy,reviews,HIGH,99224,0,0.0,PASSED
+Zero or Negative Payment Installments,Accuracy,payments,MEDIUM,103886,2,0.0019,WARNING
+Duplicate Customer IDs,Consistency,customers,HIGH,99441,0,0.0,PASSED
+Duplicate Order IDs,Consistency,orders,HIGH,99441,0,0.0,PASSED
+Duplicate Order-Item Composite Keys,Consistency,order_items,HIGH,112650,0,0.0,PASSED
+Invalid Customer State Codes (UF),Consistency,customers,HIGH,99441,0,0.0,PASSED
+Untranslated Product Categories,Consistency,products,MEDIUM,32341,13,0.0402,WARNING
+Orders -> Customers Referential Link,Referential Integrity,orders -> customers,HIGH,99441,0,0.0,PASSED
+Order Items -> Orders Referential Link,Referential Integrity,order_items -> orders,HIGH,112650,0,0.0,PASSED
+Order Items -> Products Referential Link,Referential Integrity,order_items -> products,HIGH,112650,0,0.0,PASSED
+Order Items -> Sellers Referential Link,Referential Integrity,order_items -> sellers,HIGH,112650,0,0.0,PASSED
+Payments -> Orders Referential Link,Referential Integrity,payments -> orders,HIGH,103886,0,0.0,PASSED
+Reviews -> Orders Referential Link,Referential Integrity,reviews -> orders,HIGH,99224,0,0.0,PASSED

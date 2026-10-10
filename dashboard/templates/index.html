@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Deloitte | Customer 360 Churn Intelligence Dashboard</title>
+<meta name="description" content="Deloitte Olist Customer 360 Churn Intelligence Dashboard — real-time churn risk scoring, segmentation, and retention analytics."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  --bg-base:      #060912;
+  --bg-panel:     #0d1117;
+  --bg-card:      #161b22;
+  --bg-hover:     #1c2128;
+  --border:       #21262d;
+  --border-light: #30363d;
+
+  --text-primary:   #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted:     #484f58;
+  --text-accent:    #58a6ff;
+
+  --brand-green:  #00d4aa;
+  --brand-blue:   #4d8cff;
+  --brand-purple: #a371f7;
+
+  --danger:  #f85149;
+  --warning: #f0883e;
+  --success: #3fb950;
+  --info:    #58a6ff;
+
+  --gradient-danger:  linear-gradient(135deg, #f85149 0%, #c0392b 100%);
+  --gradient-warning: linear-gradient(135deg, #f0883e 0%, #c47a21 100%);
+  --gradient-success: linear-gradient(135deg, #3fb950 0%, #238636 100%);
+  --gradient-brand:   linear-gradient(135deg, #4d8cff 0%, #a371f7 100%);
+
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow:    0 4px 16px rgba(0,0,0,.5);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.6);
+
+  --transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-fast: all 0.12s ease;
+
+  --sidebar-w: 240px;
+  --header-h: 64px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-panel); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ═══════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════ */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: rgba(6, 9, 18, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  z-index: 100;
+  gap: 20px;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo-badge {
+  width: 36px; height: 36px;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(77,140,255,.35);
+}
+
+.header-brand-text {
+  display: flex; flex-direction: column;
+}
+
+.brand-name {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-size: 10px; font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.header-divider { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+
+.header-nav {
+  display: flex; align-items: center; gap: 2px;
+  flex: 1;
+}
+
+.nav-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: none; background: none;
+  color: var(--text-secondary);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-family: inherit;
+  white-space: nowrap;
+}
+.nav-btn:hover { background: var(--bg-card); color: var(--text-primary); }
+.nav-btn.active { background: rgba(77,140,255,.12); color: var(--brand-blue); }
+
+.header-right {
+  display: flex; align-items: center; gap: 12px;
+  margin-left: auto;
+}
+
+.live-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: rgba(63,185,80,.1);
+  border: 1px solid rgba(63,185,80,.3);
+  border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  color: var(--success);
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.7); }
+}
+
+.run-ts {
+  font-size: 11px; color: var(--text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════════════════ */
+.main {
+  padding-top: calc(var(--header-h) + 28px);
+  padding-bottom: 48px;
+  padding-left: 28px;
+  padding-right: 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION HEADERS
+═══════════════════════════════════════════════════════ */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 600;
+  color: var(--text-primary);
+}
+.section-icon {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(77,140,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.section-badge {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px;
+  background: rgba(77,140,255,.1);
+  color: var(--brand-blue);
+  border-radius: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   KPI CARDS
+═══════════════════════════════════════════════════════ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: default;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.kpi-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.kpi-card.danger::before  { background: var(--gradient-danger);  }
+.kpi-card.warning::before { background: var(--gradient-warning); }
+.kpi-card.success::before { background: var(--gradient-success); }
+.kpi-card.brand::before   { background: var(--gradient-brand);   }
+
+.kpi-icon {
+  font-size: 22px;
+  margin-bottom: 10px;
+  display: block;
+}
+.kpi-label {
+  font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-size: 30px; font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-sub {
+  font-size: 11px; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 4px;
+}
+.kpi-sub .up   { color: var(--danger); }
+.kpi-sub .down { color: var(--success); }
+
+.kpi-glow-danger  { box-shadow: 0 0 0 0 transparent; }
+.kpi-glow-danger:hover  { box-shadow: 0 4px 24px rgba(248,81,73,.1); }
+.kpi-glow-warning:hover { box-shadow: 0 4px 24px rgba(240,136,62,.1); }
+.kpi-glow-success:hover { box-shadow: 0 4px 24px rgba(63,185,80,.1); }
+.kpi-glow-brand:hover   { box-shadow: 0 4px 24px rgba(77,140,255,.1); }
+
+/* ═══════════════════════════════════════════════════════
+   CHART GRID
+═══════════════════════════════════════════════════════ */
+.chart-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.chart-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.chart-grid-fullwidth {
+  margin-bottom: 20px;
+}
+@media (max-width: 1200px) {
+  .chart-grid-2 { grid-template-columns: 1fr; }
+  .chart-grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .chart-grid-3, .chart-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PANEL
+═══════════════════════════════════════════════════════ */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  transition: var(--transition);
+}
+.panel:hover { border-color: var(--border-light); }
+
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.panel-title {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-icon { font-size: 16px; }
+.panel-subtitle {
+  font-size: 11px; color: var(--text-secondary);
+  margin-top: 2px;
+}
+.panel-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px;
+}
+.panel-badge.xgboost {
+  background: rgba(163,113,247,.15);
+  color: var(--brand-purple);
+  border: 1px solid rgba(163,113,247,.3);
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+.chart-container canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RISK TIER PILLS (summary bar)
+═══════════════════════════════════════════════════════ */
+.risk-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.risk-pill {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid;
+  transition: var(--transition);
+  text-align: center;
+}
+.risk-pill:hover { transform: translateY(-2px); }
+.risk-pill.danger  { background: rgba(248,81,73,.06);  border-color: rgba(248,81,73,.25);  }
+.risk-pill.warning { background: rgba(240,136,62,.06); border-color: rgba(240,136,62,.25); }
+.risk-pill.success { background: rgba(63,185,80,.06);  border-color: rgba(63,185,80,.25);  }
+.risk-pill .pill-icon  { font-size: 18px; margin-bottom: 6px; }
+.risk-pill .pill-label { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; font-weight: 600; color: var(--text-secondary); }
+.risk-pill .pill-count { font-size: 24px; font-weight: 800; }
+.risk-pill .pill-pct   { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.risk-pill.danger  .pill-count { color: var(--danger);  }
+.risk-pill.warning .pill-count { color: var(--warning); }
+.risk-pill.success .pill-count { color: var(--success); }
+
+/* ═══════════════════════════════════════════════════════
+   DATA TABLE
+═══════════════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+table.data-table thead th {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.data-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition-fast);
+}
+table.data-table tbody tr:last-child { border-bottom: none; }
+table.data-table tbody tr:hover td { background: var(--bg-hover); }
+table.data-table tbody td {
+  padding: 9px 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.td-mono {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+.td-id { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Risk badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.badge-danger  { background: rgba(248,81,73,.15);  color: var(--danger);  border: 1px solid rgba(248,81,73,.25);  }
+.badge-warning { background: rgba(240,136,62,.15); color: var(--warning); border: 1px solid rgba(240,136,62,.25); }
+.badge-success { background: rgba(63,185,80,.15);  color: var(--success); border: 1px solid rgba(63,185,80,.25);  }
+.badge-brand   { background: rgba(77,140,255,.15); color: var(--info);    border: 1px solid rgba(77,140,255,.25); }
+
+/* ═══════════════════════════════════════════════════════
+   DECILE ROWS (colour-coded)
+═══════════════════════════════════════════════════════ */
+.decile-bar {
+  display: inline-block;
+  height: 6px;
+  border-radius: 3px;
+  min-width: 4px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOADING SKELETON
+═══════════════════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+.footer {
+  text-align: center;
+  padding: 28px;
+  color: var(--text-muted);
+  font-size: 11px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+}
+.footer span { color: var(--text-secondary); }
+
+/* ═══════════════════════════════════════════════════════
+   PAGE SECTIONS (navigation targets)
+═══════════════════════════════════════════════════════ */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════ */
+.mb-20 { margin-bottom: 20px; }
+.mb-28 { margin-bottom: 28px; }
+.text-danger  { color: var(--danger);  }
+.text-warning { color: var(--warning); }
+.text-success { color: var(--success); }
+.text-brand   { color: var(--brand-blue); }
+.text-muted   { color: var(--text-secondary); }
+.text-right   { text-align: right; }
+.font-bold    { font-weight: 700; }
+.font-mono    { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Fade-in animation for panels */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeUp 0.4s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════════ -->
+<header class="header">
+  <a class="header-brand" href="#">
+    <div class="logo-badge">D</div>
+    <div class="header-brand-text">
+      <span class="brand-name">Deloitte Analytics</span>
+      <span class="brand-sub">Customer 360 Intelligence</span>
+    </div>
+  </a>
+
+  <div class="header-divider"></div>
+
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="showSection('overview')"    id="nav-overview">   📊 Overview    </button>
+    <button class="nav-btn"        onclick="showSection('risk')"        id="nav-risk">       ⚠️  Risk Analysis</button>
+    <button class="nav-btn"        onclick="showSection('segments')"    id="nav-segments">   🎯 Segments    </button>
+    <button class="nav-btn"        onclick="showSection('geography')"   id="nav-geography">  🗺️  Geography   </button>
+    <button class="nav-btn"        onclick="showSection('customers')"   id="nav-customers">  👥 Customers   </button>
+  </nav>
+
+  <div class="header-right">
+    <div class="live-badge"><span class="live-dot"></span> Live Data</div>
+    <span class="run-ts" id="run-ts-header">Loading…</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ─── OVERVIEW SECTION ─── -->
+  <div id="section-overview" class="page-section active">
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid mb-20" id="kpi-grid">
+      <!-- Cards injected by JS -->
+      <div class="kpi-card skeleton" style="height:120px"></div>
+      <div class="kpi-card skeleton" style="height:120px"></div>
+      <div class="kpi-card skeleton" style="height:120px"></div>
+      <div class="kpi-card skeleton" style="height:120px"></div>
+      <div class="kpi-card skeleton" style="height:120px"></div>
+      <div class="kpi-card skeleton" style="height:120px"></div>
+    </div>
+
+    <!-- Risk Pill Summary Bar -->
+    <div class="risk-summary-bar mb-28" id="risk-summary">
+      <div class="risk-pill danger" id="pill-high">
+        <span class="pill-icon">🔴</span>
+        <span class="pill-label">High Risk</span>
+        <span class="pill-count" id="pill-high-ct">—</span>
+        <span class="pill-pct"  id="pill-high-pct">—</span>
+      </div>
+      <div class="risk-pill warning" id="pill-med">
+        <span class="pill-icon">🟡</span>
+        <span class="pill-label">Medium Risk</span>
+        <span class="pill-count" id="pill-med-ct">—</span>
+        <span class="pill-pct"  id="pill-med-pct">—</span>
+      </div>
+      <div class="risk-pill success" id="pill-low">
+        <span class="pill-icon">🟢</span>
+        <span class="pill-label">Low Risk</span>
+        <span class="pill-count" id="pill-low-ct">—</span>
+        <span class="pill-pct"  id="pill-low-pct">—</span>
+      </div>
+    </div>
+
+    <!-- Row 1: Risk Donut + Score Histogram -->
+    <div class="chart-grid-2 mb-20">
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🎯</span> Customer Risk Tier Distribution</div>
+            <div class="panel-subtitle">Full customer base breakdown by churn risk</div>
+          </div>
+          <span class="panel-badge xgboost">XGBoost Champion</span>
+        </div>
+        <div class="chart-container" style="height:280px">
+          <canvas id="chart-risk-donut"></canvas>
+        </div>
+      </div>
+
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">📈</span> Churn Probability Distribution</div>
+            <div class="panel-subtitle">Model score histogram across all customers</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:280px">
+          <canvas id="chart-score-hist"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Revenue trend -->
+    <div class="chart-grid-fullwidth">
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">📉</span> Monthly Order Volume &amp; Revenue Trend</div>
+            <div class="panel-subtitle">Historical marketplace activity (2016–2018)</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:240px">
+          <canvas id="chart-monthly-trend"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-overview -->
+
+
+  <!-- ─── RISK ANALYSIS SECTION ─── -->
+  <div id="section-risk" class="page-section">
+
+    <div class="chart-grid-2 mb-20">
+      <!-- Decile lift chart -->
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🎚️</span> Risk Decile Lift Chart</div>
+            <div class="panel-subtitle">Average churn probability per decile (D10 = Highest Risk)</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:280px">
+          <canvas id="chart-decile-bar"></canvas>
+        </div>
+      </div>
+
+      <!-- Payment method churn -->
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">💳</span> Churn Rate by Payment Method</div>
+            <div class="panel-subtitle">Average churn probability by preferred payment</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:280px">
+          <canvas id="chart-payment"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decile Table -->
+    <div class="panel animate-in mb-20">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon">📋</span> Decile Lift Table — Full Breakdown</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="table-decile">
+          <thead><tr>
+            <th>Decile</th>
+            <th>Customers</th>
+            <th>Avg Churn Prob</th>
+            <th>Predicted Churners</th>
+            <th>Tier Churn Rate %</th>
+            <th>Lift vs Baseline</th>
+          </tr></thead>
+          <tbody id="tbody-decile"><tr><td colspan="6" class="no-data">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /section-risk -->
+
+
+  <!-- ─── SEGMENTS SECTION ─── -->
+  <div id="section-segments" class="page-section">
+
+    <div class="chart-grid-2 mb-20">
+      <!-- Segment churn bar -->
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🧩</span> Churn Rate by Customer Segment</div>
+            <div class="panel-subtitle">RFM / K-Means cluster breakdown</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:300px">
+          <canvas id="chart-segment-bar"></canvas>
+        </div>
+      </div>
+
+      <!-- Category churn -->
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🛍️</span> Churn by Product Category</div>
+            <div class="panel-subtitle">Top 15 preferred categories — avg churn probability</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:300px">
+          <canvas id="chart-category"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segment Detail Table -->
+    <div class="panel animate-in">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon">📊</span> Segment Performance Matrix</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Segment</th>
+            <th>Customers</th>
+            <th>Avg Churn Prob %</th>
+            <th>Predicted Churners</th>
+            <th>Churn Rate %</th>
+            <th>Avg Monetary Value</th>
+            <th>Avg Review Score</th>
+          </tr></thead>
+          <tbody id="tbody-segment"><tr><td colspan="7" class="no-data">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /section-segments -->
+
+
+  <!-- ─── GEOGRAPHY SECTION ─── -->
+  <div id="section-geography" class="page-section">
+
+    <div class="chart-grid-2 mb-20">
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🗺️</span> Churn Rate by State (Top 15)</div>
+            <div class="panel-subtitle">Percentage of customers predicted to churn per Brazilian state</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="chart-state-bar"></canvas>
+        </div>
+      </div>
+
+      <div class="panel animate-in">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-icon">🏆</span> High Risk Customers by State</div>
+            <div class="panel-subtitle">Absolute high-risk customer count per state</div>
+          </div>
+        </div>
+        <div class="chart-container" style="height:340px">
+          <canvas id="chart-state-highrisk"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- State table -->
+    <div class="panel animate-in">
+      <div class="panel-header">
+        <div class="panel-title"><span class="panel-icon">📋</span> State-Level Churn Intelligence</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>State</th>
+            <th>Total Customers</th>
+            <th>Predicted Churners</th>
+            <th>Churn Rate %</th>
+            <th>Avg Churn Prob</th>
+            <th>High Risk Count</th>
+            <th>Avg Monetary Value</th>
+          </tr></thead>
+          <tbody id="tbody-state"><tr><td colspan="7" class="no-data">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /section-geography -->
+
+
+  <!-- ─── CUSTOMERS SECTION ─── -->
+  <div id="section-customers" class="page-section">
+
+    <div class="panel animate-in mb-20">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title"><span class="panel-icon">🔴</span> Top 100 High-Risk Customers — Priority Intervention List</div>
+          <div class="panel-subtitle">Sorted by churn probability descending. Ready for CRM export.</div>
+        </div>
+        <span class="panel-badge xgboost" id="high-risk-count-badge">Loading…</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Rank</th>
+            <th>Customer ID</th>
+            <th>State</th>
+            <th>Churn Prob</th>
+            <th>Risk Level</th>
+            <th>Decile</th>
+            <th>Monetary Value</th>
+            <th>Orders</th>
+            <th>Avg Review</th>
+            <th>Days Inactive</th>
+            <th>Payment</th>
+          </tr></thead>
+          <tbody id="tbody-customers"><tr><td colspan="11" class="no-data">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /section-customers -->
+
+</main>
+
+<footer class="footer">
+  <span>Deloitte Analytics Practice</span> &nbsp;|&nbsp; Olist Customer 360 Churn Intelligence Platform &nbsp;|&nbsp; Phase 10 Dashboard &nbsp;|&nbsp; Powered by XGBoost
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── Chart.js global defaults ───────────────────────
+Chart.defaults.color          = '#8b949e';
+Chart.defaults.font.family    = "Inter, system-ui, sans-serif";
+Chart.defaults.font.size      = 12;
+Chart.defaults.borderColor    = '#21262d';
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.padding  = 16;
+
+const C = {
+  danger:  '#f85149',
+  warning: '#f0883e',
+  success: '#3fb950',
+  blue:    '#58a6ff',
+  purple:  '#a371f7',
+  teal:    '#00d4aa',
+  grid:    'rgba(48,54,61,0.6)',
+};
+
+// Scale helpers
+function fmt(n)    { return n === null || n === undefined ? '—' : Number(n).toLocaleString(); }
+function fmtR(n,d=2) { return n === null || n === undefined ? '—' : Number(n).toFixed(d); }
+function fmtPct(n) { return n === null || n === undefined ? '—' : Number(n).toFixed(1) + '%'; }
+function fmtR$(n)  { return 'R$ ' + Number(n || 0).toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+// Risk colour helpers
+function riskColor(level) {
+  if (level === 'High Risk')   return C.danger;
+  if (level === 'Medium Risk') return C.warning;
+  return C.success;
+}
+function riskBadge(level) {
+  const cls = level === 'High Risk' ? 'badge-danger' : level === 'Medium Risk' ? 'badge-warning' : 'badge-success';
+  const icon = level === 'High Risk' ? '🔴' : level === 'Medium Risk' ? '🟡' : '🟢';
+  return `<span class="badge ${cls}">${icon} ${level}</span>`;
+}
+
+function liftBadge(lift) {
+  const cls = lift >= 1.5 ? 'badge-danger' : lift >= 1.0 ? 'badge-warning' : 'badge-success';
+  return `<span class="badge ${cls}">${fmtR(lift, 2)}×</span>`;
+}
+
+// ─── Chart Registry (for destroy on nav switch) ───
+const charts = {};
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ─── Colour palette for categorical charts ────────
+const PALETTE = [
+  '#4d8cff','#a371f7','#00d4aa','#f0883e','#f85149',
+  '#3fb950','#58a6ff','#ffb347','#79c0ff','#d2a8ff',
+  '#ffa657','#ff7b72','#56d364','#e3b341','#2f81f7',
+];
+
+// ─── Axis style helper ────────────────────────────
+function axisStyle() {
+  return {
+    grid:  { color: C.grid, drawBorder: false },
+    ticks: { color: '#8b949e' },
+    border: { color: '#21262d' },
+  };
+}
+
+// ════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════
+let currentSection = 'overview';
+const sectionInited = {};
+
+function showSection(name) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  currentSection = name;
+
+  if (!sectionInited[name]) {
+    sectionInited[name] = true;
+    initSection(name);
+  }
+}
+
+function initSection(name) {
+  if (name === 'risk')       initRiskSection();
+  if (name === 'segments')   initSegmentsSection();
+  if (name === 'geography')  initGeographySection();
+  if (name === 'customers')  initCustomersSection();
+}
+
+// ════════════════════════════════════════════════════
+//  DATA FETCHERS
+// ════════════════════════════════════════════════════
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Fetch failed: ${url}`);
+  return r.json();
+}
+
+// ════════════════════════════════════════════════════
+//  OVERVIEW SECTION
+// ════════════════════════════════════════════════════
+async function initOverview() {
+  const [kpis, riskDist, scoreHist, monthly] = await Promise.all([
+    fetchJSON('/api/kpis'),
+    fetchJSON('/api/risk_dist'),
+    fetchJSON('/api/score_hist'),
+    fetchJSON('/api/monthly_orders'),
+  ]);
+
+  renderKPIs(kpis, riskDist);
+  renderRiskDonut(riskDist);
+  renderScoreHist(scoreHist);
+  renderMonthlyTrend(monthly);
+
+  // Update header timestamp
+  const ts = kpis.inference_run_at || '';
+  document.getElementById('run-ts-header').textContent = ts ? 'Model run: ' + ts.replace('T', ' ').replace('Z', ' UTC') : '';
+}
+
+function renderKPIs(k, riskDist) {
+  const riskMap = {};
+  riskDist.forEach(r => riskMap[r.risk_level] = r.count);
+  const total = k.total_customers || 1;
+
+  const cards = [
+    {
+      icon:'👥', label:'Total Customers', value: fmt(k.total_customers),
+      sub:`Fully scored by XGBoost`, cls:'brand', glowCls:'kpi-glow-brand'
+    },
+    {
+      icon:'🚨', label:'Predicted Churners', value: fmt(k.predicted_churners),
+      sub:`<span class="up">▲ ${fmtPct(k.churn_rate_pct)} churn rate</span>`, cls:'danger', glowCls:'kpi-glow-danger'
+    },
+    {
+      icon:'💰', label:'Total Revenue (R$)', value: 'R$ ' + fmtMillions(k.total_revenue),
+      sub:`Avg order: R$ ${fmtR(k.avg_order_value)}`, cls:'brand', glowCls:'kpi-glow-brand'
+    },
+    {
+      icon:'⭐', label:'Avg Review Score', value: fmtR(k.avg_review_score),
+      sub:`out of 5.0`, cls:'success', glowCls:'kpi-glow-success'
+    },
+    {
+      icon:'🔄', label:'Repeat Customers', value: fmt(k.repeat_customers),
+      sub:`<span class="down">↑ ${fmtPct(k.repeat_rate_pct)} repeat rate</span>`, cls:'warning', glowCls:'kpi-glow-warning'
+    },
+    {
+      icon:'🎯', label:'High Risk', value: fmt(k.high_risk_count),
+      sub:`<span class="up">⚠ ${fmtPct(k.high_risk_pct)} of base</span>`, cls:'danger', glowCls:'kpi-glow-danger'
+    },
+  ];
+
+  document.getElementById('kpi-grid').innerHTML = cards.map(c => `
+    <div class="kpi-card ${c.cls} ${c.glowCls} animate-in">
+      <span class="kpi-icon">${c.icon}</span>
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+
+  // Risk pills
+  const pd = {};
+  riskDist.forEach(r => pd[r.risk_level] = r.count);
+  document.getElementById('pill-high-ct').textContent  = fmt(pd['High Risk'] || 0);
+  document.getElementById('pill-high-pct').textContent = fmtPct((pd['High Risk']||0)/total*100) + ' of base — Immediate Action';
+  document.getElementById('pill-med-ct').textContent   = fmt(pd['Medium Risk'] || 0);
+  document.getElementById('pill-med-pct').textContent  = fmtPct((pd['Medium Risk']||0)/total*100) + ' of base — Proactive Engagement';
+  document.getElementById('pill-low-ct').textContent   = fmt(pd['Low Risk'] || 0);
+  document.getElementById('pill-low-pct').textContent  = fmtPct((pd['Low Risk']||0)/total*100) + ' of base — Sustain Loyalty';
+}
+
+function fmtMillions(n) {
+  if (!n) return '0';
+  const m = n / 1_000_000;
+  return m >= 1 ? m.toFixed(1) + 'M' : (n/1000).toFixed(0) + 'K';
+}
+
+function renderRiskDonut(data) {
+  destroyChart('risk-donut');
+  const order = ['High Risk', 'Medium Risk', 'Low Risk'];
+  const colors = [C.danger, C.warning, C.success];
+  const sorted = order.map(l => data.find(r => r.risk_level === l) || {risk_level: l, count: 0});
+
+  charts['risk-donut'] = new Chart(document.getElementById('chart-risk-donut'), {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(r => r.risk_level),
+      datasets: [{
+        data: sorted.map(r => r.count),
+        backgroundColor: colors,
+        borderColor: '#0d1117',
+        borderWidth: 3,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            font: { size: 12, weight: '500' },
+            padding: 16,
+            generateLabels: function(chart) {
+              const data = chart.data;
+              const total = data.datasets[0].data.reduce((a,b)=>a+b,0);
+              return data.labels.map((label, i) => ({
+                text: `${label}  (${((data.datasets[0].data[i]/total)*100).toFixed(1)}%)`,
+                fillStyle: colors[i],
+                strokeStyle: colors[i],
+                lineWidth: 0,
+                index: i,
+              }));
+            },
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = ((ctx.parsed/total)*100).toFixed(1);
+              return ` ${fmt(ctx.parsed)} customers (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderScoreHist(data) {
+  destroyChart('score-hist');
+  const barColors = data.map(d => {
+    const b = parseFloat(d.bucket);
+    if (b >= 0.70) return C.danger;
+    if (b >= 0.40) return C.warning;
+    return C.success;
+  });
+
+  charts['score-hist'] = new Chart(document.getElementById('chart-score-hist'), {
+    type: 'bar',
+    data: {
+      labels: data.map(d => fmtR(parseFloat(d.bucket), 2)),
+      datasets: [{
+        label: 'Customers',
+        data: data.map(d => d.count),
+        backgroundColor: barColors,
+        borderColor: 'transparent',
+        borderRadius: 3,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => `Churn Probability ≈ ${items[0].label}`,
+            label:  (ctx)  => ` ${fmt(ctx.parsed.y)} customers`,
+          }
+        }
+      },
+      scales: {
+        x: { ...axisStyle(), title: { display: true, text: 'Churn Probability', color: '#8b949e' } },
+        y: { ...axisStyle(), title: { display: true, text: 'Customers', color: '#8b949e' },
+             ticks: { callback: (v) => fmt(v), color: '#8b949e' } },
+      }
+    }
+  });
+}
+
+function renderMonthlyTrend(data) {
+  destroyChart('monthly-trend');
+  charts['monthly-trend'] = new Chart(document.getElementById('chart-monthly-trend'), {
+    type: 'line',
+    data: {
+      labels: data.map(d => d.month),
+      datasets: [
+        {
+          label: 'Orders',
+          data: data.map(d => d.orders),
+          borderColor: C.blue,
+          backgroundColor: 'rgba(77,140,255,0.08)',
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Revenue (R$)',
+          data: data.map(d => d.revenue),
+          borderColor: C.teal,
+          backgroundColor: 'rgba(0,212,170,0.06)',
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.datasetIndex === 1
+              ? ` Revenue: R$ ${fmt(ctx.parsed.y)}`
+              : ` Orders: ${fmt(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x:  { ...axisStyle(), ticks: { maxTicksLimit: 12, color: '#8b949e' } },
+        y:  { ...axisStyle(), position: 'left',  title: { display: true, text: 'Orders',      color: '#8b949e' } },
+        y1: { ...axisStyle(), position: 'right', title: { display: true, text: 'Revenue (R$)', color: '#8b949e' }, grid: { display: false } },
+      }
+    }
+  });
+}
+
+
+// ════════════════════════════════════════════════════
+//  RISK SECTION
+// ════════════════════════════════════════════════════
+async function initRiskSection() {
+  const [decileData, paymentData] = await Promise.all([
+    fetchJSON('/api/decile'),
+    fetchJSON('/api/payment'),
+  ]);
+  renderDecileBar(decileData);
+  renderPaymentChart(paymentData);
+  renderDecileTable(decileData);
+}
+
+function renderDecileBar(data) {
+  destroyChart('decile-bar');
+  const reversed = [...data].reverse();
+  const barColors = reversed.map(d => {
+    if (d.avg_churn_prob >= 0.70) return C.danger;
+    if (d.avg_churn_prob >= 0.40) return C.warning;
+    return C.success;
+  });
+
+  charts['decile-bar'] = new Chart(document.getElementById('chart-decile-bar'), {
+    type: 'bar',
+    data: {
+      labels: reversed.map(d => `D${d.decile}`),
+      datasets: [{
+        label: 'Avg Churn Prob',
+        data: reversed.map(d => (d.avg_churn_prob * 100).toFixed(1)),
+        backgroundColor: barColors,
+        borderColor: 'transparent',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` Avg churn prob: ${ctx.parsed.y}% | Predicted churners: ${fmt(reversed[ctx.dataIndex]?.predicted_churners)}`
+          }
+        }
+      },
+      scales: {
+        x: { ...axisStyle() },
+        y: { ...axisStyle(), max: 100, title: { display: true, text: 'Avg Churn Probability (%)', color: '#8b949e' },
+             ticks: { callback: v => v + '%', color: '#8b949e' } },
+      }
+    }
+  });
+}
+
+function renderPaymentChart(data) {
+  destroyChart('payment');
+  charts['payment'] = new Chart(document.getElementById('chart-payment'), {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.payment_method),
+      datasets: [
+        {
+          label: 'Avg Churn Prob %',
+          data: data.map(d => d.avg_churn_prob_pct),
+          backgroundColor: C.blue,
+          borderColor: 'transparent',
+          borderRadius: 4,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Avg Monetary Value (R$)',
+          data: data.map(d => d.avg_monetary_value),
+          backgroundColor: C.teal,
+          borderColor: 'transparent',
+          borderRadius: 4,
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.datasetIndex === 0
+              ? ` Avg churn: ${ctx.parsed.y}%`
+              : ` Avg monetary: R$ ${fmtR(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x:  { ...axisStyle() },
+        y:  { ...axisStyle(), position: 'left',  title: { display: true, text: 'Avg Churn %',    color: '#8b949e' } },
+        y1: { ...axisStyle(), position: 'right', title: { display: true, text: 'Avg Monetary R$', color: '#8b949e' }, grid: { display: false } },
+      }
+    }
+  });
+}
+
+function renderDecileTable(data) {
+  const tbody = document.getElementById('tbody-decile');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="no-data">No data</td></tr>'; return; }
+
+  tbody.innerHTML = data.map((r, i) => {
+    const pct = r.avg_churn_prob * 100;
+    const color = pct >= 70 ? C.danger : pct >= 40 ? C.warning : C.success;
+    const barW = Math.round(pct);
+    return `<tr>
+      <td class="font-bold">${r.decile}</td>
+      <td>${fmt(r.customers)}</td>
+      <td>
+        <span class="decile-bar" style="width:${barW}px;background:${color}"></span>
+        ${fmtR(pct, 1)}%
+      </td>
+      <td>${fmt(r.predicted_churners)}</td>
+      <td>${fmtPct(r.tier_churn_rate_pct)}</td>
+      <td>${liftBadge(r.lift)}</td>
+    </tr>`;
+  }).join('');
+}
+
+
+// ════════════════════════════════════════════════════
+//  SEGMENTS SECTION
+// ════════════════════════════════════════════════════
+async function initSegmentsSection() {
+  const [segData, catData] = await Promise.all([
+    fetchJSON('/api/segment'),
+    fetchJSON('/api/category_churn'),
+  ]);
+  renderSegmentBar(segData);
+  renderCategoryChart(catData);
+  renderSegmentTable(segData);
+}
+
+function renderSegmentBar(data) {
+  destroyChart('segment-bar');
+  if (!data.length) return;
+  charts['segment-bar'] = new Chart(document.getElementById('chart-segment-bar'), {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.segment),
+      datasets: [
+        {
+          label: 'Avg Churn Prob %',
+          data: data.map(d => d.avg_churn_prob_pct),
+          backgroundColor: data.map((_,i) => PALETTE[i % PALETTE.length] + 'CC'),
+          borderColor:      data.map((_,i) => PALETTE[i % PALETTE.length]),
+          borderWidth: 1.5,
+          borderRadius: 4,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Avg Monetary Value (R$)',
+          data: data.map(d => d.avg_monetary_value),
+          type: 'line',
+          borderColor: C.teal,
+          backgroundColor: 'rgba(0,212,170,0.08)',
+          borderWidth: 2.5,
+          tension: 0.4,
+          fill: false,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x:  { ...axisStyle() },
+        y:  { ...axisStyle(), position: 'left',  title: { display: true, text: 'Avg Churn %',    color: '#8b949e' } },
+        y1: { ...axisStyle(), position: 'right', title: { display: true, text: 'Avg Monetary R$', color: '#8b949e' }, grid: { display: false } },
+      }
+    }
+  });
+}
+
+function renderCategoryChart(data) {
+  destroyChart('category');
+  if (!data.length) return;
+  charts['category'] = new Chart(document.getElementById('chart-category'), {
+    type: 'bar',
+    indexAxis: 'y',
+    data: {
+      labels: data.map(d => d.category.replace(/_/g, ' ')),
+      datasets: [{
+        label: 'Avg Churn Prob %',
+        data: data.map(d => d.avg_churn_prob_pct),
+        backgroundColor: data.map((_,i) => PALETTE[i % PALETTE.length] + 'CC'),
+        borderColor:      data.map((_,i) => PALETTE[i % PALETTE.length]),
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` Avg churn: ${ctx.parsed.x}% | Customers: ${fmt(data[ctx.dataIndex]?.customers)}`
+          }
+        }
+      },
+      scales: {
+        x: { ...axisStyle(), title: { display: true, text: 'Avg Churn Prob (%)', color: '#8b949e' } },
+        y: { ...axisStyle(), ticks: { font: { size: 10.5 }, color: '#8b949e' } },
+      }
+    }
+  });
+}
+
+function renderSegmentTable(data) {
+  const tbody = document.getElementById('tbody-segment');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="no-data">No segment data found</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td class="font-bold">${r.segment}</td>
+    <td>${fmt(r.customers)}</td>
+    <td>${fmtR(r.avg_churn_prob_pct, 2)}%</td>
+    <td>${fmt(r.predicted_churners)}</td>
+    <td>${fmtPct(r.churn_rate_pct)}</td>
+    <td>${fmtR$(r.avg_monetary_value)}</td>
+    <td>${fmtR(r.avg_review_score, 2)}</td>
+  </tr>`).join('');
+}
+
+
+// ════════════════════════════════════════════════════
+//  GEOGRAPHY SECTION
+// ════════════════════════════════════════════════════
+async function initGeographySection() {
+  const stateData = await fetchJSON('/api/state');
+  renderStateBar(stateData);
+  renderStateHighRisk(stateData);
+  renderStateTable(stateData);
+}
+
+function renderStateBar(data) {
+  destroyChart('state-bar');
+  const top15 = data.slice(0, 15);
+  charts['state-bar'] = new Chart(document.getElementById('chart-state-bar'), {
+    type: 'bar',
+    indexAxis: 'y',
+    data: {
+      labels: top15.map(d => d.state),
+      datasets: [{
+        label: 'Churn Rate %',
+        data: top15.map(d => d.churn_rate_pct),
+        backgroundColor: top15.map(d => {
+          const r = d.churn_rate_pct;
+          if (r >= 75) return C.danger;
+          if (r >= 60) return C.warning;
+          return C.success;
+        }),
+        borderColor: 'transparent',
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` Churn Rate: ${ctx.parsed.x}% | Total: ${fmt(top15[ctx.dataIndex]?.total_customers)}`
+          }
+        }
+      },
+      scales: {
+        x: { ...axisStyle(), title: { display: true, text: 'Churn Rate (%)', color: '#8b949e' } },
+        y: { ...axisStyle() },
+      }
+    }
+  });
+}
+
+function renderStateHighRisk(data) {
+  destroyChart('state-highrisk');
+  const top15 = [...data].sort((a,b) => b.high_risk_count - a.high_risk_count).slice(0, 15);
+  charts['state-highrisk'] = new Chart(document.getElementById('chart-state-highrisk'), {
+    type: 'bar',
+    indexAxis: 'y',
+    data: {
+      labels: top15.map(d => d.state),
+      datasets: [{
+        label: 'High Risk Customers',
+        data: top15.map(d => d.high_risk_count),
+        backgroundColor: C.danger + 'CC',
+        borderColor: C.danger,
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ` High Risk: ${fmt(ctx.parsed.x)} customers`
+          }
+        }
+      },
+      scales: {
+        x: { ...axisStyle(), title: { display: true, text: 'High Risk Customers', color: '#8b949e' } },
+        y: { ...axisStyle() },
+      }
+    }
+  });
+}
+
+function renderStateTable(data) {
+  const tbody = document.getElementById('tbody-state');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="no-data">No data</td></tr>'; return; }
+  tbody.innerHTML = data.map(r => {
+    const rateCls = r.churn_rate_pct >= 75 ? 'text-danger' : r.churn_rate_pct >= 60 ? 'text-warning' : 'text-success';
+    return `<tr>
+      <td class="font-bold">${r.state}</td>
+      <td>${fmt(r.total_customers)}</td>
+      <td>${fmt(r.predicted_churners)}</td>
+      <td class="${rateCls} font-bold">${fmtPct(r.churn_rate_pct)}</td>
+      <td>${fmtR(r.avg_churn_prob, 4)}</td>
+      <td>${fmt(r.high_risk_count)}</td>
+      <td>${fmtR$(r.avg_monetary_value)}</td>
+    </tr>`;
+  }).join('');
+}
+
+
+// ════════════════════════════════════════════════════
+//  CUSTOMERS SECTION
+// ════════════════════════════════════════════════════
+async function initCustomersSection() {
+  const data = await fetchJSON('/api/top_risk');
+  document.getElementById('high-risk-count-badge').textContent = `${fmt(data.length)} customers shown`;
+  const tbody = document.getElementById('tbody-customers');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="11" class="no-data">No high-risk customers found</td></tr>'; return; }
+
+  tbody.innerHTML = data.map((r, i) => `<tr>
+    <td class="font-bold text-muted">${i + 1}</td>
+    <td class="td-mono td-id" title="${r.customer_unique_id}">${r.customer_unique_id.substring(0, 14)}…</td>
+    <td class="font-bold">${r.customer_state}</td>
+    <td class="font-bold text-danger">${fmtR(r.churn_probability * 100, 1)}%</td>
+    <td>${riskBadge(r.risk_level)}</td>
+    <td><span class="badge badge-brand">D${r.risk_decile}</span></td>
+    <td>${fmtR$(r.monetary_value)}</td>
+    <td>${fmt(r.total_orders)}</td>
+    <td>${fmtR(r.avg_review_score, 2)}</td>
+    <td class="${r.days_since_last_order > 180 ? 'text-danger' : ''}">${fmt(r.days_since_last_order)} days</td>
+    <td><span class="badge badge-brand">${r.preferred_payment_method}</span></td>
+  </tr>`).join('');
+}
+
+
+// ════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════
+(async () => {
+  sectionInited['overview'] = true;
+  await initOverview();
+})();
+</script>
+</body>
+</html>
